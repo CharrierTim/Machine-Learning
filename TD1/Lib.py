@@ -3,20 +3,15 @@ import random
 import time
 import os
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
 
 # Importing the dataset
-import psutil
 from keras.datasets import mnist
 
 # Neural network
 import tensorflow as tf
 import keras
-from keras.callbacks import ModelCheckpoint
-from keras.datasets import fashion_mnist
 from keras.layers.core import Dense, Dropout, Activation
 from keras.models import Sequential
 from keras.utils import np_utils
@@ -31,7 +26,7 @@ class Loading_MNIST:
     ''' This class loads the MNIST dataset and reshapes it to 4D
     By @Timothée Charrier
     '''
-
+    
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
 
     # Reshaphe the data to 4D
@@ -82,12 +77,12 @@ class MLP:
 
     Parameters
     ----------
-    epochs : int, see report for more details
-    batch_size : int, see report for more details    
+    epochs : int, see report for more details **default = 10**
+    batch_size : int, see report for more details **default = 128**
     '''
 
     def __init__(self, epochs=10, batch_size=128):
-        self.X_train, self.Y_train, self.X_test, self.Y_test = Loading_MNIST().get_all_data()
+        self.X_train, self.Y_train, self.X_test, self.Y_test = Loading_MNIST().get_all_data_4D()
         self.epochs = epochs
         self.batch_size = batch_size
         self.model = Sequential()
@@ -128,34 +123,33 @@ class MLP:
         self.train_model()
         self.evaluate_model()
         time_end = time.time()
-        print('Total execution time: ', time_end - time_start, 's')
-        print('Memory usage: ', psutil.Process(
-            os.getpid()).memory_info().rss / 1024 ** 2, 'MB')
+        print("Creating, compiling, training and evaluating the CNN model took", time_end - time_start, "seconds")
 
 ############################################################################################################
 # CNN class using the Loading_MNIST class
 ############################################################################################################
 
-
 class CNN:
+    ''' This class creates a CNN model
+    By @Timothée Charrier
+
+    Parameters
+    ----------
+    epochs : int, see report for more details **default = 10**
+    batch_size : int, see report for more details **default = 128**
+    '''
 
     def __init__(self, epochs=10, batch_size=128):
-        self.X_train, self.Y_train, self.X_test, self.Y_test = Loading_MNIST().get_all_data()
+        self.X_train, self.Y_train, self.X_test, self.Y_test = Loading_MNIST().get_all_data_4D()
         self.epochs = epochs
         self.batch_size = batch_size
         self.model = Sequential()
         self.history = None
 
-    def create_model(self):
-        self.model.add(Conv2D(32, kernel_size=(3, 3),
-                              activation='relu',
-                              input_shape=(28, 28, 1)))
-        self.model.add(Conv2D(64, (3, 3), activation='relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        self.model.add(Dropout(0.25))
+    def create_model(self):    
+        self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+        self.model.add(MaxPooling2D((2, 2)))
         self.model.add(Flatten())
-        self.model.add(Dense(128, activation='relu'))
-        self.model.add(Dropout(0.5))
         self.model.add(Dense(10, activation='softmax'))
 
     def compile_model(self):
@@ -189,9 +183,28 @@ class CNN:
         self.train_model()
         self.evaluate_model()
         time_end = time.time()
-        print('Total execution time: ', time_end - time_start, 's')
-        print('Memory usage: ', psutil.Process(
-            os.getpid()).memory_info().rss / 1024 ** 2, 'MB')
+        print("Creating, compiling, training and evaluating the CNN model took", time_end - time_start, "seconds")
+  
+
+    def plot_learning_curve(self):
+        plt.figure(figsize=(10, 10))
+        plt.subplot(2, 1, 1)
+        plt.plot(self.history.history['loss'], label='Training loss')
+        plt.plot(self.history.history['val_loss'], label='Validation loss')
+        plt.legend(loc='upper right')
+        plt.ylabel('Cross Entropy')
+        plt.xlabel('Epoch')
+        plt.title('Training and Validation Loss')
+
+        plt.subplot(2, 1, 2)
+        plt.plot(self.history.history['accuracy'], label='Training accuracy')
+        plt.plot(self.history.history['val_accuracy'], label='Validation accuracy')
+        plt.legend(loc='lower right')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.title('Training and Validation Accuracy')
+
+        plt.show()
 
 
 ############################################################################################################
@@ -243,6 +256,19 @@ def PCA_reconstruction_example(X_train_flat, n_components):
     return List_explained_variance
 
 
+from IPython.display import Image
+def include_image(path):
+    return Image(filename=path)
+
+
+__func__ = ""
+
 if __name__ == "__main__":
-    mnist = Loading_MNIST()
-    X_train, Y_train, X_test, Y_test = mnist.get_all_data()
+    if __func__ == "MLP":
+        model = MLP()
+        model.run_model()
+    elif __func__ == "CNN":
+        model = CNN()
+        model.run_model()
+    else :
+        mnist = Loading_MNIST()
