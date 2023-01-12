@@ -4,6 +4,7 @@ import time
 import os
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 
 # Importing the dataset
@@ -255,11 +256,79 @@ def PCA_reconstruction_example(X_train_flat, n_components):
     plt.show()
     return List_explained_variance
 
+############################################################################################################
+# SVC with different PCA components
+############################################################################################################
 
-from IPython.display import Image
-def include_image(path):
-    return Image(filename=path)
+def SVC_PCA(n_components):
+    ''' This function creates a SVC model with different number of PCA components
+    By @Timothée Charrier
 
+    Parameters
+    ----------
+    n_components : array of int
+
+    Returns
+    -------
+    List_accuracy_train : array
+    List_accuracy_test : array
+    '''
+
+    #  Load the dataset
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+    
+    # Reshaping the array for PCA
+    X_train = X_train.reshape(60000, 784)
+    X_test = X_test.reshape(10000, 784)
+
+    # Normalizing the data
+    X_train = X_train / 255.0
+    X_test = X_test / 255.0
+
+    # Perfom SVC on the dataset with diffrent PCA components
+
+    #  Create a list of the number of components
+    n_components = [10, 20, 30, 40, 50, 100, 200]
+
+    #  Create a list of the accuracy of train set and test set
+    List_accuracy_train = []
+    List_accuracy_test = []
+
+    #  Create a list of the time
+    List_time = []
+
+    # Perfom SVC on the dataset with diffrent PCA components
+    for n in n_components:
+        #  Create a PCA object with n components
+        pca = PCA(n_components=n)
+
+        #  Fit the PCA object on the train set
+        pca.fit(X_train)
+
+        #  Transform the train set and test set
+        X_train_pca = pca.transform(X_train)
+        X_test_pca = pca.transform(X_test)
+
+        #  Create a SVC object
+        svc = SVC()
+
+        #  Fit the SVC object on the train set
+        svc.fit(X_train_pca, Y_train)
+
+        #  Get the accuracy of the train set and test set
+        accuracy_train = svc.score(X_train_pca, Y_train)
+        accuracy_test = svc.score(X_test_pca, Y_test)
+
+        #  Append the accuracy to the list
+        List_accuracy_train.append(accuracy_train)
+        List_accuracy_test.append(accuracy_test)
+    
+    return List_accuracy_train, List_accuracy_test
+
+
+############################################################################################################
+#  Main
+############################################################################################################
 
 __func__ = ""
 
@@ -272,3 +341,4 @@ if __name__ == "__main__":
         model.run_model()
     else :
         mnist = Loading_MNIST()
+

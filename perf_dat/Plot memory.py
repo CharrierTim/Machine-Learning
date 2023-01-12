@@ -1,15 +1,19 @@
 # plot memory usage from .dat file in same folder
+# File format: 1st line: header
+# 1st column: useless
+# 2nd column: memory usage in MB
+# 3rd column: time (from time() function))
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-def plot_memory_usage():
-    # ignore first line and column
-    data = np.loadtxt('mprofile_20230112184759.dat', skiprows=1, usecols=range(1, 2))
-    plt.plot(data)
-    plt.xlabel('Time (s)')
-    plt.ylabel('Memory usage (MB)')
+def plot_memory_usage(filename):
+    # read data
+    data = np.loadtxt(filename, delimiter='\t', skiprows=1)
+    # plot
+    plt.plot(data[:, 1])
+    plt.xlabel('time (s)')
+    plt.ylabel('memory usage (MB)')
     plt.show()
 
-if __name__ == '__main__':
-    plot_memory_usage()
+plot_memory_usage('test.dat')
