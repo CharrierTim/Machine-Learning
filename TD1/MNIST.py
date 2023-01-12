@@ -3,43 +3,39 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
+from keras.datasets import mnist
+from sklearn.cluster import KMeans
 
+# Load the dataset
 
-# Display the raw data
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-X = np.load('/home/tim/MNIST/MNIST_X_28x28.npy')
-Y = np.load('/home/tim/MNIST/MNIST_y.npy')
+# Convert and normalize the data
 
-print("X.shape = ", X.shape)
-print("Y.shape = ", Y.shape)
+X_train = X_train.reshape(60000, 784)
+X_test = X_test.reshape(10000, 784)
 
-# Display the picture with matplotlib in ../MNIST
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
 
-nb_samples = random.randint(0, X.shape[0])
+X_train = X_train / 255
+X_test = X_test / 255
 
-plt.imshow(X[nb_samples])
-img_title = "This is a %i" %Y[nb_samples]
-plt.title(img_title)
+# Perform PCA to reduce the dimension of the data with 200 nb_components
+
+pca = PCA(n_components=200).fit(X_train)
+X_train = pca.transform(X_train)
+
+# Perform K-means clustering with 10 clusters
+
+kmn = KMeans(n_clusters=10, random_state=0).fit(X_train)
+kmn.fit(X_train)
+
+# Plot the results
+
+y_pred = kmn.predict(X_train)
+
+plt.figure(figsize=(10, 10))
+plt.scatter(X_train[:, 0], X_train[:, 1], c=y_pred)
 plt.show()
-plt.clf()
-
-# Split the data into training and testing
-
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.25, random_state=42)
-
-print("X_train.shape = ", X_train.shape)
-print("Y_train.shape = ", Y_train.shape)
-
-# Function to report the distribution of the data in PERCENTAGE
-def report_distribution(Y):
-    nb_samples = Y.shape[0]
-    for i in range(10):
-        nb_i = np.sum(Y == i)
-        print("There are %i samples of %i (%.2f %%) in the dataset" %(nb_i, i, nb_i/nb_samples*100))
-        
-report_distribution(Y_train)
-report_distribution(Y_test)
-
-
