@@ -285,11 +285,6 @@ def SVC_PCA(n_components):
     X_train = X_train / 255.0
     X_test = X_test / 255.0
 
-    # Perfom SVC on the dataset with diffrent PCA components
-
-    #  Create a list of the number of components
-    n_components = [10, 20, 30, 40, 50, 100, 200]
-
     #  Create a list of the accuracy of train set and test set
     List_accuracy_train = []
     List_accuracy_test = []
@@ -322,7 +317,16 @@ def SVC_PCA(n_components):
         #  Append the accuracy to the list
         List_accuracy_train.append(accuracy_train)
         List_accuracy_test.append(accuracy_test)
-    
+        
+    #  Plot the accuracy of train set and test set
+    plt.plot(n_components, List_accuracy_train, label='Train set')
+    plt.plot(n_components, List_accuracy_test, label='Test set')
+    plt.xlabel('Number of components')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy of train set and test set with different number of components')
+    plt.legend()
+    plt.show()
+        
     return List_accuracy_train, List_accuracy_test
 
 
