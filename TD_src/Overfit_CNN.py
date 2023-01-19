@@ -67,11 +67,11 @@ def Overfit_few_samples(nb_samples = 10):
                 loss=tf.keras.losses.CategoricalCrossentropy(),
                 metrics=['accuracy'])
 
-    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test))
+    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test), verbose = 0)
 
     # Evaluate the model
 
-    score = model.evaluate(X_test, Y_test, verbose=2)
+    score = model.evaluate(X_test, Y_test, verbose=0)
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
@@ -137,11 +137,11 @@ def Overfit_huge_batch_size(batch_size = 8192):
                 loss=tf.keras.losses.CategoricalCrossentropy(),
                 metrics=['accuracy'])
 
-    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test))
+    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test), verbose = 0)
 
     # Evaluate the model
 
-    score = model.evaluate(X_test, Y_test, verbose=2)
+    score = model.evaluate(X_test, Y_test, verbose=0)
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
 
