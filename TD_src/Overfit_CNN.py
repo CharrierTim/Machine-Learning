@@ -24,11 +24,6 @@ from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Conv2D, MaxPooling2D, Flatten
 
-# Memory management
-from memory_profiler import profile
-
-# @profile
-
 def Overfit_few_samples(nb_samples = 10):
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
     X_train = np.expand_dims(X_train, axis=-1)
@@ -174,9 +169,4 @@ def Overfit_huge_batch_size(batch_size = 8192):
 
 
 if __name__ == "__main__":
-    # Plot total memory usage
-    memory = psutil.virtual_memory()
-    Overfit_huge_batch_size()
-    memory2 = psutil.virtual_memory()
-    plt.show()
-    print("Memory usage: ", memory2.used - memory.used / 1024 / 1024, "MB")
+    print('main')
