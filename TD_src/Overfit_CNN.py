@@ -1,6 +1,10 @@
 # Let's make a CNN overfit
+# By: Timothée Charrier
 
 # Importing the libraries
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 import numpy as np
 import random
 import time
@@ -167,6 +171,5 @@ def Overfit_huge_batch_size(batch_size = 8192):
     plt.xlabel('Epoch')
     plt.title('Training and Validation Accuracy')
 
-
 if __name__ == "__main__":
-    print('main')
+    print("Overfit few samples")

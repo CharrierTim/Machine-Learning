@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+
 import numpy as np
 import random
 import time
@@ -149,6 +152,8 @@ class CNN:
 
     def create_model(self):    
         self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+        self.model.add(MaxPooling2D((2, 2)))
+        self.model.add(Conv2D(64, (3, 3), activation='relu'))
         self.model.add(MaxPooling2D((2, 2)))
         self.model.add(Flatten())
         self.model.add(Dense(10, activation='softmax'))
@@ -334,7 +339,7 @@ def SVC_PCA(n_components):
 #  Main
 ############################################################################################################
 
-__func__ = ""
+__func__ = "CNN"
 
 if __name__ == "__main__":
     if __func__ == "MLP":
