@@ -81,7 +81,7 @@ def Overfit_few_samples(nb_samples = 10):
 
     # Plot images from the predictions
 
-    predictions = model.predict(X_test)
+    predictions = model.predict(X_test, verbose=0)
 
     # Plot learning curves
 

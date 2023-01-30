@@ -88,9 +88,7 @@ def MLP_overfit_few_samples(nb_samples = 10):
     plt.xlabel('Epoch')
     plt.title('Training and Validation Accuracy')
 
-
     plt.show()
-
 
 
 if __name__ == "__main__":
