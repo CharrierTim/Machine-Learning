@@ -1,85 +1,39 @@
-# Plot the maximum margin separating hyperplane within a two-class separable dataset using a Support Vector Machine classifier with linear kernel.
+# Compare CNN performance with more layers and more neurons 
 
-from sklearn.decomposition import PCA
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn import svm
 from keras.datasets import mnist
-from sklearn.metrics import accuracy_score
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras.utils import to_categorical
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import GridSearchCV
 
-from sklearn.inspection import DecisionBoundaryDisplay
+# Load MNIST dataset
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
 
-def SVC_C(C = [0.0001, 1, 100000], kernel = 'linear'):
-    # Load MNIST dataset
-    (X_train, y_train), (X_test, y_test) = mnist.load_data()
+# Reshape data
+X_train = X_train.reshape(X_train.shape[0], -1)
+X_test = X_test.reshape(X_test.shape[0], -1)
 
-    # Reshape data
-    X_train = X_train.reshape(X_train.shape[0], -1)
-    X_test = X_test.reshape(X_test.shape[0], -1)
+# Normalize data
+X_train = X_train / 255
+X_test = X_test / 255
 
-    # Normalize data
-    X_train = X_train / 255
-    X_test = X_test / 255
+def create_model():
+    # Create a model
+    model = Sequential()
+    model.add(Dense(512, activation='relu', input_shape=(784,)))
+    model.add(Dense(512, activation='relu'))
+    model.add(Dense(10, activation='softmax'))
 
-    # PCA to reduce dimensionality
-    # Reduce to 2 dimensions
-    pca = PCA(n_components=2)
-    X_train = pca.fit_transform(X_train)
-    X_test = pca.transform(X_test)
+    # Compile the model
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    # Let's only take 2 classes
-    X_train = X_train[y_train < 2]
-    y_train = y_train[y_train < 2]
+    # Fit the model
+    model.fit(X_train, to_categorical(y_train), epochs=10, batch_size=128, verbose=0)
 
-    X_test = X_test[y_test < 2]
-    y_test = y_test[y_test < 2]
-
-    # Plot the data on the same figure the 3 different result of the SVM
-    figure = plt.figure(figsize=(10, 10))
-
-
-    for c in C:
-        clf = svm.SVC(kernel=kernel, C=c)
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        print("Accuracy with linear kernel and C = {}: ".format(c), accuracy_score(y_test, y_pred))
-
-        # Plot each result on the same figure
-
-
-        plt.subplot(2, 2, C.index(c) + 1)
-        plt.subplots_adjust(wspace=0.4, hspace=0.4)
-        plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, s=30, cmap=plt.cm.Paired)
-
-        # plot the decision function
-        ax = plt.gca()
-        DecisionBoundaryDisplay.from_estimator(
-            clf,
-            X_train,
-            plot_method="contour",
-            colors="k",
-            levels=[-1, 0, 1],
-            alpha=0.5,
-            linestyles=["--", "-", "--"],
-            ax=ax,
-        )
-        # plot support vectors
-        ax.scatter(
-            clf.support_vectors_[:, 0],
-            clf.support_vectors_[:, 1],
-            s=100,
-            linewidth=1,
-            facecolors="none",
-            edgecolors="k",
-        )
-
-        plt.title("C = {}".format(c))
-        plt.xlabel("First principal component")
-        plt.ylabel("Second principal component")
-
-    plt.show()
-
-if __name__ == "__main__":
-    SVC_C([0.00001, 1, 10])
-
-    
+    # Evaluate the model
+    score = model.evaluate(X_test, to_categorical(y_test), verbose=0)
+    return score[1]
