@@ -5,31 +5,32 @@
 ############################################################################################################
 
 # Ignore warnings
+from keras.layers import Conv2D, MaxPooling2D, Flatten
+from keras.utils import np_utils
+from keras.models import Sequential
+from keras.layers.core import Dense, Dropout, Activation
+import keras
+import tensorflow as tf
+from keras.datasets import mnist
+import seaborn as sns
+import sklearn.metrics as sk_metrics
+from sklearn import svm
+from sklearn.metrics import accuracy_score
+from sklearn.svm import SVC
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import time
+import random
+import numpy as np
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Importing the libraries
-import numpy as np
-import random
-import time
-import os
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
-from sklearn import svm
-#from sklearn.inspection import DecisionBoundaryDisplay
+# from sklearn.inspection import DecisionBoundaryDisplay
 
 # Importing the dataset
-from keras.datasets import mnist
 
 # Neural network
-import tensorflow as tf
-import keras
-from keras.layers.core import Dense, Dropout, Activation
-from keras.models import Sequential
-from keras.utils import np_utils
-from keras.layers import Conv2D, MaxPooling2D, Flatten
 
 ############################################################################################################
 # Loading_MNIST class
@@ -40,7 +41,7 @@ class Loading_MNIST:
     ''' This class loads the MNIST dataset and reshapes it to 4D
     By @Timothée Charrier
     '''
-    
+
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
 
     # Reshaphe the data to 4D
@@ -79,6 +80,24 @@ class Loading_MNIST:
         return mnist.load_data()
 
 # MLP class using the Loading_MNIST class
+
+############################################################################################################
+# Plot confusion matrix
+############################################################################################################
+
+
+def show_confusion_matrix(test_labels, test_classes):
+    # Compute confusion matrix and normalize
+    plt.figure(figsize=(10, 10))
+    confusion = sk_metrics.confusion_matrix(test_labels, test_classes)
+    confusion_normalized = confusion / confusion.sum(axis=1)
+    axis_labels = range(10)
+    ax = sns.heatmap(
+        confusion_normalized, xticklabels=axis_labels, yticklabels=axis_labels,
+        cmap='Blues', annot=True, fmt='.4f', square=True)
+    plt.title("Confusion matrix")
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
 
 ############################################################################################################
 # MLP class
@@ -137,11 +156,13 @@ class MLP:
         self.train_model()
         self.evaluate_model()
         time_end = time.time()
-        print("Creating, compiling, training and evaluating the CNN model took", time_end - time_start, "seconds")
+        print("Creating, compiling, training and evaluating the CNN model took",
+              time_end - time_start, "seconds")
 
 ############################################################################################################
 # CNN class using the Loading_MNIST class
 ############################################################################################################
+
 
 class CNN:
     ''' This class creates a CNN model
@@ -160,8 +181,9 @@ class CNN:
         self.model = Sequential()
         self.history = None
 
-    def create_model(self):    
-        self.model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    def create_model(self):
+        self.model.add(
+            Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
         self.model.add(MaxPooling2D((2, 2)))
         self.model.add(Conv2D(64, (3, 3), activation='relu'))
         self.model.add(MaxPooling2D((2, 2)))
@@ -199,8 +221,8 @@ class CNN:
         self.train_model()
         self.evaluate_model()
         time_end = time.time()
-        print("Creating, compiling, training and evaluating the CNN model took", time_end - time_start, "seconds")
-  
+        print("Creating, compiling, training and evaluating the CNN model took",
+              time_end - time_start, "seconds")
 
     def plot_learning_curve(self):
         plt.figure(figsize=(10, 10))
@@ -214,7 +236,8 @@ class CNN:
 
         plt.subplot(2, 1, 2)
         plt.plot(self.history.history['accuracy'], label='Training accuracy')
-        plt.plot(self.history.history['val_accuracy'], label='Validation accuracy')
+        plt.plot(self.history.history['val_accuracy'],
+                 label='Validation accuracy')
         plt.legend(loc='lower right')
         plt.ylabel('Accuracy')
         plt.xlabel('Epoch')
@@ -275,6 +298,7 @@ def PCA_reconstruction_example(X_train_flat, n_components):
 # SVC with different PCA components
 ############################################################################################################
 
+
 def SVC_PCA(n_components):
     ''' This function creates a SVC model with different number of PCA components
     By @Timothée Charrier
@@ -291,7 +315,7 @@ def SVC_PCA(n_components):
 
     #  Load the dataset
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
-    
+
     # Reshaping the array for PCA
     X_train = X_train.reshape(60000, 784)
     X_test = X_test.reshape(10000, 784)
@@ -332,23 +356,25 @@ def SVC_PCA(n_components):
         #  Append the accuracy to the list
         List_accuracy_train.append(accuracy_train)
         List_accuracy_test.append(accuracy_test)
-        
+
     #  Plot the accuracy of train set and test set
     plt.plot(n_components, List_accuracy_train, label='Train set')
     plt.plot(n_components, List_accuracy_test, label='Test set')
     plt.xlabel('Number of components')
     plt.ylabel('Accuracy')
-    plt.title('Accuracy of train set and test set with different number of components')
+    plt.title(
+        'Accuracy of train set and test set with different number of components')
     plt.legend()
     plt.show()
-        
+
     return List_accuracy_train, List_accuracy_test
 
 ############################################################################################################
 #  Function to compare SVM with different kernels
 ############################################################################################################
 
-def SVC_kernels(K = ['linear', 'poly', 'rbf', 'sigmoid']):
+
+def SVC_kernels(K=['linear', 'poly', 'rbf', 'sigmoid']):
     # Load MNIST dataset
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
@@ -382,7 +408,8 @@ def SVC_kernels(K = ['linear', 'poly', 'rbf', 'sigmoid']):
 #  Function to compare SVM with different C values
 ############################################################################################################
 
-def SVC_C(C = [0.0001, 1, 100000], kernel = 'linear'):
+
+def SVC_C(C=[0.0001, 1, 100000], kernel='linear'):
 
     print("/!\")")
     print("THIS FUNCTION WON'Y WORK ON GOOGLE COLAB")
@@ -416,23 +443,23 @@ def SVC_C(C = [0.0001, 1, 100000], kernel = 'linear'):
     # Plot the data on the same figure the 3 different result of the SVM
     figure = plt.figure(figsize=(10, 10))
 
-
     for c in C:
         clf = svm.SVC(kernel=kernel, C=c)
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
-        print("Accuracy with linear kernel and C = {}: ".format(c), accuracy_score(y_test, y_pred))
+        print("Accuracy with linear kernel and C = {}: ".format(
+            c), accuracy_score(y_test, y_pred))
 
         # Plot each result on the same figure
 
-
         plt.subplot(2, 2, C.index(c) + 1)
         plt.subplots_adjust(wspace=0.4, hspace=0.4)
-        plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, s=30, cmap=plt.cm.Paired)
+        plt.scatter(X_train[:, 0], X_train[:, 1],
+                    c=y_train, s=30, cmap=plt.cm.Paired)
 
         # plot the decision function
         ax = plt.gca()
-        #DecisionBoundaryDisplay.from_estimator(clf,X_train,plot_method="contour",colors="k",levels=[-1, 0, 1],alpha=0.5,linestyles=["--", "-", "--"],ax=ax,)
+        # DecisionBoundaryDisplay.from_estimator(clf,X_train,plot_method="contour",colors="k",levels=[-1, 0, 1],alpha=0.5,linestyles=["--", "-", "--"],ax=ax,)
         # plot support vectors
         ax.scatter(
             clf.support_vectors_[:, 0],
@@ -463,6 +490,5 @@ if __name__ == "__main__":
     elif __func__ == "CNN":
         model = CNN()
         model.run_model()
-    else :
+    else:
         mnist = Loading_MNIST()
-

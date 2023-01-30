@@ -27,6 +27,30 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Conv2D, MaxPooling2D, Flatten
+import sklearn.metrics as sk_metrics
+import seaborn as sns
+
+############################################################################################################
+# Plot confusion matrix
+############################################################################################################
+
+
+def show_confusion_matrix(test_labels, test_classes):
+    # Compute confusion matrix and normalize
+    plt.figure(figsize=(10, 10))
+    confusion = sk_metrics.confusion_matrix(test_labels, test_classes)
+    confusion_normalized = confusion / confusion.sum(axis=1)
+    axis_labels = range(10)
+    ax = sns.heatmap(
+        confusion_normalized, xticklabels=axis_labels, yticklabels=axis_labels,
+        cmap='Blues', annot=True, fmt='.4f', square=True)
+    plt.title("Confusion matrix")
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
+
+############################################################################################################
+# Overfitting
+############################################################################################################
 
 def Overfit_few_samples(nb_samples = 10):
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
@@ -102,6 +126,9 @@ def Overfit_few_samples(nb_samples = 10):
     plt.xlabel('Epoch')
     plt.title('Training and Validation Accuracy')
 
+    # Confusion matrix
+    show_confusion_matrix(np.argmax(Y_test, axis=1), np.argmax(predictions, axis=1))
+
 
 def Overfit_huge_batch_size(batch_size = 8192):
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
@@ -170,6 +197,9 @@ def Overfit_huge_batch_size(batch_size = 8192):
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
     plt.title('Training and Validation Accuracy')
+
+    # Confusion matrix
+    show_confusion_matrix(np.argmax(Y_test, axis=1), np.argmax(predictions, axis=1))
 
 if __name__ == "__main__":
     print("Overfit few samples")
