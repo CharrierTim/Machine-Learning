@@ -18,7 +18,7 @@ from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn import svm
-from sklearn.inspection import DecisionBoundaryDisplay
+#from sklearn.inspection import DecisionBoundaryDisplay
 
 # Importing the dataset
 from keras.datasets import mnist
@@ -383,6 +383,12 @@ def SVC_kernels(K = ['linear', 'poly', 'rbf', 'sigmoid']):
 ############################################################################################################
 
 def SVC_C(C = [0.0001, 1, 100000], kernel = 'linear'):
+
+    print("/!\")")
+    print("THIS FUNCTION WON'Y WORK ON GOOGLE COLAB")
+    print("It uses DecisionBoundary function, which is not a on a stable realease of scikit-learn yet")
+    print("/!\")")
+
     # Load MNIST dataset
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
@@ -426,16 +432,7 @@ def SVC_C(C = [0.0001, 1, 100000], kernel = 'linear'):
 
         # plot the decision function
         ax = plt.gca()
-        DecisionBoundaryDisplay.from_estimator(
-            clf,
-            X_train,
-            plot_method="contour",
-            colors="k",
-            levels=[-1, 0, 1],
-            alpha=0.5,
-            linestyles=["--", "-", "--"],
-            ax=ax,
-        )
+        #DecisionBoundaryDisplay.from_estimator(clf,X_train,plot_method="contour",colors="k",levels=[-1, 0, 1],alpha=0.5,linestyles=["--", "-", "--"],ax=ax,)
         # plot support vectors
         ax.scatter(
             clf.support_vectors_[:, 0],
