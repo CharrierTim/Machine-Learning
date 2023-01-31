@@ -1,5 +1,5 @@
 # README OF THE 2023 MACHINE LEARNING PROJECT
-By Authors: **Timothée Charrier** et **Thomas Ravelet**
+Authors: **Timothée Charrier** et **Thomas Ravelet**
 
 # Usefull information about the project
 
