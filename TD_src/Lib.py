@@ -6,34 +6,36 @@
 ############################################################################################################
 
 # Ignore warnings
-from keras.layers import Conv2D, MaxPooling2D, Flatten
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.model_selection import train_test_split
-from keras.utils import np_utils
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+
+import matplotlib.pyplot as plt
+import time
+import random
+import numpy as np
+import seaborn as sns
+
+import tensorflow as tf
+import keras
+from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
-import keras
-import tensorflow as tf
-from keras.datasets import mnist
-import seaborn as sns
+from keras.layers import Conv2D, MaxPooling2D, Flatten
+from keras.utils import np_utils
+from keras.callbacks import ModelCheckpoint
+
+
+from sklearn.metrics import accuracy_score
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 import sklearn.metrics as sk_metrics
 from sklearn import svm
 from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import time
-import random
-import numpy as np
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+# from sklearn.inspection import DecisionBoundaryDisplay 
 
-# Importing the libraries
-# from sklearn.inspection import DecisionBoundaryDisplay
-
-# Importing the dataset
-
-# Neural network
 
 ############################################################################################################
 # Loading_MNIST class
@@ -536,6 +538,214 @@ def DecisionTreeClassifier_PCA(n_components=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
     plt.plot(component, accuracy)
     plt.xlabel('Number of components')
     plt.ylabel('Accuracy')
+    plt.show()
+
+############################################################################################################
+# Plot confusion matrix
+############################################################################################################
+
+
+def show_confusion_matrix(test_labels, test_classes):
+
+    ''' This function plots the confusion matrix of the model.
+    
+    Parameters
+    ----------
+    test_labels : array, the labels of the test set
+    test_classes : array, the predicted classes of the test set
+
+    Returns
+    -------
+    plot : plot of the confusion matrix
+    '''
+
+    # Compute confusion matrix and normalize
+    plt.figure(figsize=(10, 10))
+    confusion = sk_metrics.confusion_matrix(test_labels, test_classes)
+    confusion_normalized = confusion / confusion.sum(axis=1)
+    axis_labels = range(10)
+    ax = sns.heatmap(
+        confusion_normalized, xticklabels=axis_labels, yticklabels=axis_labels,
+        cmap='Blues', annot=True, fmt='.4f', square=True)
+    plt.title("Confusion matrix")
+    plt.ylabel("True label")
+    plt.xlabel("Predicted label")
+    plt.show()
+
+############################################################################################################
+# Overfitting
+############################################################################################################
+
+def CNN_Overfit_few_samples(nb_samples = 10):
+
+    ''' This function creates a CNN model with only one hidden layer and trains it on a small number of samples.
+    The goal is to overfit the model and see how it performs on the test set.
+
+    Parameters
+    ----------
+    nb_samples : int, the number of samples to use for training
+
+    Returns
+    -------
+    plot : plot of the accuracy and loss of the model on the training and validation sets and confusion matrix
+    print : the accuracy of the model on the test set
+    '''
+
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+    X_train = np.expand_dims(X_train, axis=-1)
+    X_test = np.expand_dims(X_test, axis=-1)
+
+    # Reshape the data to 28x28 pixels
+
+    X_train = X_train.astype('float32')
+    X_test = X_test.astype('float32')
+
+    # Normalize the data to the range of [0, 1]
+
+    X_train /= 255
+    X_test /= 255
+
+    # Convert the labels to one-hot encoding
+
+    Y_train = np_utils.to_categorical(Y_train, 10)
+    Y_test = np_utils.to_categorical(Y_test, 10)
+
+    # Take only 10 images for training
+
+    X_train = X_train[:nb_samples]
+    Y_train = Y_train[:nb_samples]
+
+    batch_size = 128
+    epochs = 100
+
+    # Create the model with only one hidden layer
+
+    model = Sequential()
+    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    model.add(MaxPooling2D((2, 2)))
+    model.add(Dropout(0.2))
+    model.add(Flatten())
+    model.add(Dense(10, activation='softmax'))
+
+    model.summary()
+
+    model.compile(optimizer='adam',
+                loss=tf.keras.losses.CategoricalCrossentropy(),
+                metrics=['accuracy'])
+
+    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test), verbose =0)
+
+    # Evaluate the model
+
+    score = model.evaluate(X_test, Y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+
+    # Plot images from the predictions
+
+    predictions = model.predict(X_test, verbose=0)
+
+    # Plot learning curves
+
+    plt.figure(figsize=(10, 10))
+    plt.subplot(2, 1, 1)
+    plt.plot(history.history['loss'], label='Training loss')
+    plt.plot(history.history['val_loss'], label='Validation loss')
+    plt.legend(loc='upper right')
+    plt.ylabel('Cross Entropy')
+    plt.xlabel('Epoch')
+    plt.title('Training and Validation Loss')
+
+    plt.subplot(2, 1, 2)
+    plt.plot(history.history['accuracy'], label='Training accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation accuracy')
+    plt.legend(loc='lower right')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.title('Training and Validation Accuracy')
+
+    # Confusion matrix
+    show_confusion_matrix(np.argmax(Y_test, axis=1), np.argmax(predictions, axis=1))
+
+############################################################################################################
+# MLP overfit with few samples
+############################################################################################################
+
+def MLP_overfit_few_samples(nb_samples = 10):
+
+    ''' This function creates a MLP model with only one hidden layer and trains it on a small number of samples.
+    The goal is to overfit the model and see how it performs on the test set.
+
+    Parameters
+    ----------
+    nb_samples : int, the number of samples to use for training
+
+    Returns
+    -------
+    plot : plot of the accuracy and loss of the model on the training and validation sets
+    print : the accuracy of the model on the test set
+    '''
+
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+    X_train = np.expand_dims(X_train, axis=-1)
+    X_test = np.expand_dims(X_test, axis=-1)
+
+    # Reshape the data to 28x28 pixels
+    X_train = X_train.astype('float32')
+    X_test = X_test.astype('float32')
+
+    # Normalize the data to the range of [0, 1]
+    X_train /= 255
+    X_test /= 255
+
+    # Convert the labels to one-hot encoding
+    Y_train = np_utils.to_categorical(Y_train, 10)
+    Y_test = np_utils.to_categorical(Y_test, 10)
+
+    X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.2, random_state=42)
+
+    # Take only 10 images for training
+    X_train = X_train[:nb_samples]
+    Y_train = Y_train[:nb_samples]
+
+    batch_size = 128
+    epochs = 100
+
+    # Create the MLP model with only one hidden layer
+    model = Sequential()
+    model.add(Flatten(input_shape=(28, 28, 1)))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(10, activation='softmax'))
+
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    # Train the model
+    history = model.fit(X_train, Y_train, batch_size=batch_size, epochs=epochs, verbose=0, validation_data=(X_val, Y_val))
+
+    # Evaluate the model
+    score = model.evaluate(X_test, Y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+
+    # Plot learning curves
+
+    plt.figure(figsize=(10, 10))
+    plt.subplot(2, 1, 1)
+    plt.plot(history.history['loss'], label='Training loss')
+    plt.plot(history.history['val_loss'], label='Validation loss')
+    plt.legend(loc='upper right')
+    plt.ylabel('Cross Entropy')
+    plt.xlabel('Epoch')
+    plt.title('Training and Validation Loss')
+
+    plt.subplot(2, 1, 2)
+    plt.plot(history.history['accuracy'], label='Training accuracy')
+    plt.plot(history.history['val_accuracy'], label='Validation accuracy')
+    plt.legend(loc='lower right')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.title('Training and Validation Accuracy')
+
     plt.show()
 
 
