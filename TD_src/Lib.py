@@ -7,6 +7,8 @@
 
 # Ignore warnings
 from keras.layers import Conv2D, MaxPooling2D, Flatten
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
 from keras.utils import np_utils
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation
@@ -489,6 +491,51 @@ def SVC_C(C=[0.0001, 1, 100000], kernel='linear'):
         plt.xlabel("First principal component")
         plt.ylabel("Second principal component")
 
+    plt.show()
+
+############################################################################################################
+# Decisio tree classifier accuracy with different PCA componentsa values
+############################################################################################################
+
+def DecisionTreeClassifier_PCA(n_components=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]):
+    # Importing the dataset
+    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
+
+    # Reshape the data to 28x28 pixels
+    X_train = X_train.reshape(60000, 784)
+    X_test = X_test.reshape(10000, 784)
+
+    # Normalize the data to the range of [0, 1]
+    X_train = X_train.astype('float32')
+    X_test = X_test.astype('float32')
+
+    X_train /= 255
+    X_test /= 255
+
+    # Convert the labels to one-hot encoding
+    Y_train = np_utils.to_categorical(Y_train, 10)
+    Y_test = np_utils.to_categorical(Y_test, 10)
+
+    # Split the data into training and validation sets
+    X_train, X_val, Y_train, Y_val = train_test_split(X_train, Y_train, test_size=0.2, random_state=42)
+
+    component = [1,2,3,5,10,20,30,40,50,60,70,80,90,100,200]
+    accuracy = []
+
+    for i in component:
+        pca = PCA(n_components=i)
+        pca.fit(X_train)
+        X_train_pca = pca.transform(X_train)
+        X_test_pca = pca.transform(X_test)
+        X_val_pca = pca.transform(X_val)
+        clf = DecisionTreeClassifier()
+        clf.fit(X_train_pca, Y_train)
+        Y_pred = clf.predict(X_val_pca)
+        accuracy.append(accuracy_score(Y_val, Y_pred))
+
+    plt.plot(component, accuracy)
+    plt.xlabel('Number of components')
+    plt.ylabel('Accuracy')
     plt.show()
 
 

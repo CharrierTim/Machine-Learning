@@ -60,6 +60,7 @@ def show_confusion_matrix(test_labels, test_classes):
     plt.title("Confusion matrix")
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
+    plt.show()
 
 ############################################################################################################
 # Overfitting
@@ -134,78 +135,6 @@ def Overfit_few_samples(nb_samples = 10):
 
     predictions = model.predict(X_test, verbose=0)
 
-    # Plot learning curves
-
-    plt.figure(figsize=(10, 10))
-    plt.subplot(2, 1, 1)
-    plt.plot(history.history['loss'], label='Training loss')
-    plt.plot(history.history['val_loss'], label='Validation loss')
-    plt.legend(loc='upper right')
-    plt.ylabel('Cross Entropy')
-    plt.xlabel('Epoch')
-    plt.title('Training and Validation Loss')
-
-    plt.subplot(2, 1, 2)
-    plt.plot(history.history['accuracy'], label='Training accuracy')
-    plt.plot(history.history['val_accuracy'], label='Validation accuracy')
-    plt.legend(loc='lower right')
-    plt.ylabel('Accuracy')
-    plt.xlabel('Epoch')
-    plt.title('Training and Validation Accuracy')
-
-    # Confusion matrix
-    show_confusion_matrix(np.argmax(Y_test, axis=1), np.argmax(predictions, axis=1))
-
-
-def Overfit_huge_batch_size(batch_size = 8192):
-    (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
-    X_train = np.expand_dims(X_train, axis=-1)
-    X_test = np.expand_dims(X_test, axis=-1)
-
-    # Reshape the data to 28x28 pixels
-
-    X_train = X_train.astype('float32')
-    X_test = X_test.astype('float32')
-
-    # Normalize the data to the range of [0, 1]
-
-    X_train /= 255
-    X_test /= 255
-
-    # Convert the labels to one-hot encoding
-
-    Y_train = np_utils.to_categorical(Y_train, 10)
-    Y_test = np_utils.to_categorical(Y_test, 10)
-
-    batch_size = 8192
-    epochs = 10
-
-    # Create the model with only one hidden layer
-
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
-    model.add(MaxPooling2D((2, 2)))
-    model.add(Dropout(0.2))
-    model.add(Flatten())
-    model.add(Dense(10, activation='softmax'))
-
-    model.summary()
-
-    model.compile(optimizer='adam',
-                loss=tf.keras.losses.CategoricalCrossentropy(),
-                metrics=['accuracy'])
-
-    history = model.fit(X_train, Y_train, epochs=epochs, batch_size=batch_size, validation_data=(X_test, Y_test), verbose = 0)
-
-    # Evaluate the model
-
-    score = model.evaluate(X_test, Y_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
-
-    # Plot images from the predictions
-
-    predictions = model.predict(X_test)
     # Plot learning curves
 
     plt.figure(figsize=(10, 10))
