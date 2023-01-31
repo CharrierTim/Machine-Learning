@@ -36,6 +36,19 @@ import seaborn as sns
 
 
 def show_confusion_matrix(test_labels, test_classes):
+
+    ''' This function plots the confusion matrix of the model.
+    
+    Parameters
+    ----------
+    test_labels : array, the labels of the test set
+    test_classes : array, the predicted classes of the test set
+
+    Returns
+    -------
+    plot : plot of the confusion matrix
+    '''
+
     # Compute confusion matrix and normalize
     plt.figure(figsize=(10, 10))
     confusion = sk_metrics.confusion_matrix(test_labels, test_classes)
@@ -53,6 +66,20 @@ def show_confusion_matrix(test_labels, test_classes):
 ############################################################################################################
 
 def Overfit_few_samples(nb_samples = 10):
+
+    ''' This function creates a CNN model with only one hidden layer and trains it on a small number of samples.
+    The goal is to overfit the model and see how it performs on the test set.
+
+    Parameters
+    ----------
+    nb_samples : int, the number of samples to use for training
+
+    Returns
+    -------
+    plot : plot of the accuracy and loss of the model on the training and validation sets and confusion matrix
+    print : the accuracy of the model on the test set
+    '''
+
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)

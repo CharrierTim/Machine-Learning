@@ -1,4 +1,5 @@
 # Author: Timothée Charrier
+# About this file: This file contains the functions used in the TD.
 
 ############################################################################################################
 # Importing the libraries
@@ -87,6 +88,19 @@ class Loading_MNIST:
 
 
 def show_confusion_matrix(test_labels, test_classes):
+
+    ''' This function plots the confusion matrix of the model.
+    
+    Parameters
+    ----------
+    test_labels : array, the labels of the test set
+    test_classes : array, the predicted classes of the test set
+
+    Returns
+    -------
+    plot : plot of the confusion matrix
+    '''
+
     # Compute confusion matrix and normalize
     plt.figure(figsize=(10, 10))
     confusion = sk_metrics.confusion_matrix(test_labels, test_classes)
@@ -105,6 +119,7 @@ def show_confusion_matrix(test_labels, test_classes):
 
 
 class MLP:
+
     ''' This class creates a MLP model
     By @Timothée Charrier
 

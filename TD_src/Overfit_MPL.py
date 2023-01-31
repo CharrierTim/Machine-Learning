@@ -27,7 +27,25 @@ from keras.models import Sequential
 from keras.utils import np_utils
 from keras.layers import Flatten
 
+############################################################################################################
+# MLP overfit with few samples
+############################################################################################################
+
 def MLP_overfit_few_samples(nb_samples = 10):
+
+    ''' This function creates a MLP model with only one hidden layer and trains it on a small number of samples.
+    The goal is to overfit the model and see how it performs on the test set.
+
+    Parameters
+    ----------
+    nb_samples : int, the number of samples to use for training
+
+    Returns
+    -------
+    plot : plot of the accuracy and loss of the model on the training and validation sets
+    print : the accuracy of the model on the test set
+    '''
+
     (X_train, Y_train), (X_test, Y_test) = mnist.load_data()
     X_train = np.expand_dims(X_train, axis=-1)
     X_test = np.expand_dims(X_test, axis=-1)
