@@ -1,6 +1,6 @@
 # README OF THE 2023 MACHINE LEARNING PROJECT
-Authors: **Timothée Charrier** et **Thomas Ravelet**
-Ecole des Mines de Saint-Etienne, Cycle ISMIN - 2023\ 
+Authors: **Timothée Charrier** et **Thomas Ravelet**\
+Ecole des Mines de Saint-Etienne, Cycle ISMIN - 2023
 
 # Usefull information about the project
 
