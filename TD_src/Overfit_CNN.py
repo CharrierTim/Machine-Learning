@@ -66,7 +66,7 @@ def show_confusion_matrix(test_labels, test_classes):
 # Overfitting
 ############################################################################################################
 
-def Overfit_few_samples(nb_samples = 10):
+def CNN_Overfit_few_samples(nb_samples = 10):
 
     ''' This function creates a CNN model with only one hidden layer and trains it on a small number of samples.
     The goal is to overfit the model and see how it performs on the test set.
